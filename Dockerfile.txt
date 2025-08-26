@@ -1,0 +1,21 @@
+# Étape 1 : Build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /app
+
+# Copier les fichiers csproj et restaurer les dépendances
+COPY *.csproj ./ 
+COPY DevOpsTestApi.Tests/*.csproj ./DevOpsTestApi.Tests/
+RUN dotnet restore
+
+# Copier tout le code et publier en Release
+COPY . .
+RUN dotnet publish DevOpsTestApi/DevOpsTestApi.csproj -c Release -o out
+
+# Étape 2 : Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out .
+
+# Exposer le port de l'API
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "DevOpsTestApi.dll"]
