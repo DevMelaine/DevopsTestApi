@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        dotnet 'dotnet7'  // Nom du SDK configuré dans Jenkins
+        dotnet 'dotnet7'  // Nom du SDK configurÃ© dans Jenkins
     }
 
     environment {
@@ -47,13 +47,13 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline terminée.'
+            echo 'Pipeline terminÃ©e.'
         }
         success {
-            echo 'Pipeline exécutée avec succès !'
+            echo 'Pipeline exÃ©cutÃ©e avec succÃ¨s !'
         }
         failure {
-            echo 'Pipeline échouée.'
+            echo 'Pipeline Ã©chouÃ©e.'
         }
     }
 }
