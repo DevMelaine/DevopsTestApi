@@ -29,8 +29,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build l'image Docker de ton API
-                    bat "docker build -t %IMAGE_NAME% .\\%API_PATH%"
+                    // Build l'image Docker de ton API (Dockerfile à la racine)
+                    bat "docker build -t %IMAGE_NAME% ."
                 }
             }
         }
@@ -64,3 +64,4 @@ pipeline {
         }
     }
 }
+
