@@ -13,10 +13,14 @@ pipeline {
             steps {
                 script {
                     // Supprime le conteneur si déjà existant
-                    sh """
-                        if [ \$(docker ps -a -q -f name=$CONTAINER_NAME) ]; then
-                            docker rm -f $CONTAINER_NAME
-                        fi
+                    bat """
+                        @echo off
+                        docker ps -a -q -f name=%CONTAINER_NAME% > temp.txt
+                        set /p CONTAINER_ID=<temp.txt
+                        if not "%CONTAINER_ID%"=="" (
+                            docker rm -f %CONTAINER_NAME%
+                        )
+                        del temp.txt
                     """
                 }
             }
@@ -26,7 +30,7 @@ pipeline {
             steps {
                 script {
                     // Build l'image Docker de ton API
-                    sh "docker build -t $IMAGE_NAME ./$API_PATH"
+                    bat "docker build -t %IMAGE_NAME% .\\%API_PATH%"
                 }
             }
         }
@@ -35,9 +39,7 @@ pipeline {
             steps {
                 script {
                     // Lance le conteneur sur le port 5000
-                    sh """
-                        docker run -d -p 5000:8080 --name $CONTAINER_NAME $IMAGE_NAME
-                    """
+                    bat "docker run -d -p 5000:8080 --name %CONTAINER_NAME% %IMAGE_NAME%"
                 }
             }
         }
@@ -46,7 +48,7 @@ pipeline {
             steps {
                 script {
                     // Simple test GET pour vérifier que le conteneur tourne
-                    sh "curl -f http://localhost:5000 || echo 'API not responding yet'"
+                    bat "powershell -Command \"try { Invoke-WebRequest -UseBasicParsing http://localhost:5000 -ErrorAction Stop } catch { Write-Host 'API not responding yet' }\""
                 }
             }
         }
