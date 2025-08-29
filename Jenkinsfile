@@ -13,14 +13,10 @@ pipeline {
             steps {
                 script {
                     // Supprime le conteneur si déjà existant
-                    bat """
-                        @echo off
-                        docker ps -a -q -f name=%CONTAINER_NAME% > temp.txt
-                        set /p CONTAINER_ID=<temp.txt
-                        if not "%CONTAINER_ID%"=="" (
-                            docker rm -f %CONTAINER_NAME%
-                        )
-                        del temp.txt
+                    sh """
+                        if [ \$(docker ps -a -q -f name=$CONTAINER_NAME) ]; then
+                            docker rm -f $CONTAINER_NAME
+                        fi
                     """
                 }
             }
@@ -29,8 +25,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build l'image Docker de ton API (Dockerfile à la racine)
-                    bat "docker build -t %IMAGE_NAME% ."
+                    // Build l'image Docker de ton API (Dockerfile à la racine ou $API_PATH)
+                    sh "docker build -t $IMAGE_NAME ./$API_PATH"
                 }
             }
         }
@@ -39,7 +35,7 @@ pipeline {
             steps {
                 script {
                     // Lance le conteneur sur le port 5000
-                    bat "docker run -d -p 5000:8080 --name %CONTAINER_NAME% %IMAGE_NAME%"
+                    sh "docker run -d -p 5000:8080 --name $CONTAINER_NAME $IMAGE_NAME"
                 }
             }
         }
@@ -48,7 +44,14 @@ pipeline {
             steps {
                 script {
                     // Simple test GET pour vérifier que le conteneur tourne
-                    bat "powershell -Command \"try { Invoke-WebRequest -UseBasicParsing http://localhost:5000 -ErrorAction Stop } catch { Write-Host 'API not responding yet' }\""
+                    sh """
+                        if curl -s http://localhost:5000 > /dev/null; then
+                            echo "✅ API répond correctement"
+                        else
+                            echo "❌ API ne répond pas encore"
+                            exit 1
+                        fi
+                    """
                 }
             }
         }
