@@ -1,8 +1,8 @@
-# Étape 1 : Build
+# Ã‰tape 1 : Build
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Copier les fichiers csproj et restaurer les dépendances
+# Copier les fichiers csproj et restaurer les dÃ©pendances
 COPY *.csproj ./ 
 COPY DevOpsTestApi.Tests/*.csproj ./DevOpsTestApi.Tests/
 RUN dotnet restore
@@ -11,7 +11,7 @@ RUN dotnet restore
 COPY . .
 RUN dotnet publish DevOpsTestApi/DevOpsTestApi.csproj -c Release -o out
 
-# Étape 2 : Runtime
+# Ã‰tape 2 : Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
