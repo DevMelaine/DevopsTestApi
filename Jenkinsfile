@@ -25,7 +25,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build l'image Docker de ton API (Dockerfile à la racine ou $API_PATH)
+                    // Build l'image Docker (chemin du Dockerfile à la racine de $API_PATH)
                     sh "docker build -t $IMAGE_NAME ./$API_PATH"
                 }
             }
@@ -43,14 +43,19 @@ pipeline {
         stage('Test API') {
             steps {
                 script {
-                    // Simple test GET pour vérifier que le conteneur tourne
+                    // Test simple avec curl
                     sh """
-                        if curl -s http://localhost:5000 > /dev/null; then
-                            echo "✅ API répond correctement"
-                        else
-                            echo "❌ API ne répond pas encore"
-                            exit 1
-                        fi
+                        echo "⏳ Test de l'API..."
+                        for i in {1..5}; do
+                            if curl -s http://localhost:5000 > /dev/null; then
+                                echo "✅ API répond correctement"
+                                exit 0
+                            fi
+                            echo "⚠️  API pas encore dispo, nouvelle tentative..."
+                            sleep 3
+                        done
+                        echo "❌ API ne répond pas après plusieurs tentatives"
+                        exit 1
                     """
                 }
             }
