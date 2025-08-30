@@ -1,0 +1,17 @@
+services:
+  api:
+    image: devopstest-api
+    container_name: devopstest-api
+    build: .
+    ports:
+      - "5000:8080"   # API accessible sur http://localhost:5000
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "9112:8080"   # Interface web
+      - "50000:50000" # Communication avec agents
+    volumes:
+      - ./jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
